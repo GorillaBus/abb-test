@@ -1,0 +1,30 @@
+{
+	"app": {
+	    "name": "ABB Technical Test",
+	    "port": 3000,
+	    "debug": true
+	},
+	"mongodb" : {
+		"host" : "127.0.0.1",
+		"db" : "abb",
+		"port" : 27017,
+		"user" : "",
+		"password" : "",
+		"connSettings": {
+			"useNewUrlParser": true,
+			"useUnifiedTopology": true
+		}
+	},
+    "socket": {
+        "ping": {
+            "pingTimeout": 10000,
+            "pingInterval": 10000
+        }
+    },
+	"logging": {
+	    "file" : "../log/app.log",
+	    "max_size" : 10485760,
+	    "compress" : true,
+	    "stdout" : true
+	}
+}
