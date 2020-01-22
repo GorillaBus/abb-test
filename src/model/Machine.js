@@ -3,8 +3,7 @@
 const model = (mongoose) => {
 
 	const MachineSchema = new mongoose.Schema({
-		mid: { type: String, required: true, unique: true },
-		model: { type: String, required: true },
+		name: { type: String, required: true },
 		description: { type: String, required: false },
 		token: { type: String, required: false }
 	});
