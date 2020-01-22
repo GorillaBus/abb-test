@@ -8,10 +8,10 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 
 	/*
 	**	Computes deviations in part creation by comparing payload
-	** 	 values with some part's control profile.
+	**	values with some part's control profile.
 	*/
-	const computeDeviations = (payload, controls) => {
-		return controls.map(reference => {
+	const validateControlData = (payload, profile) => {
+		return profile.controls.map(reference => {
 
 			// Get corresponding payload control
 			const values = payload.find((paylodItem) => {
@@ -28,13 +28,19 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 
 			// Validation
 			const validation = {
-				x_valid: deviations.x <= reference.x_tol,
-				y_valid: deviations.y <= reference.y_tol,
-				z_valid: deviations.z <= reference.z_tol,
-				d_valid: deviations.d <= reference.d_tol
+				x_valid: deviations.x_dev <= reference.x_tol,
+				y_valid: deviations.y_dev <= reference.y_tol,
+				z_valid: deviations.z_dev <= reference.z_tol,
+				d_valid: deviations.d_dev <= reference.d_tol
 			};
 
 			return {
+				machine_id: profile.id,
+				control_id: values.control_id,
+				x: values.x,
+				y: values.y,
+				z: values.z,
+				d: values.d,
 				...deviations,
 				...validation
 			}
@@ -42,7 +48,7 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 	};
 
 	return {
-		computeDeviations
+		validateControlData
 	}
 };
 
