@@ -78,15 +78,21 @@ module.exports = (appSettings, enums, Logger, services) => {
 
 
 	/*
-	**	Handle addition of new Part to a machine
+	**	Handle addition of new Part to a machine:
+	**	Validates all controles for each part feature by computing
+	**	the differences between the produced part and the part profile.
+	**
+	**	Saves the report to DB
+	**
 	*/
-	const handlePart = (payload) => {
-		Logger.info(`PART received from machine: ${this.socket.machineProfile.id}`);
+	const handlePart = async (payload) => {
+		Logger.info(`PART payload received from machine: ${this.socket.machineProfile.id}`);
 
-		// Compute deviations
-		const deviations = services.Control.computeDeviations(payload, this.socket.machineProfile.controls);
+		// Validate part controls and get a report
+		const report = services.Control.validateControlData(payload, this.socket.machineProfile);
 
-		console.log(deviations);
+		// Save log to db
+		const log = await services.Registry.save(report);
 	};
 
 
