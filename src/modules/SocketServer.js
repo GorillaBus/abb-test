@@ -93,6 +93,25 @@ module.exports = (appSettings, enums, Logger, services) => {
 
 		// Save log to db
 		const log = await services.Registry.save(report);
+
+		// Get aggregated sum of deviations per control per part
+		const aggDeviations = await services.Registry.getAggregatedDeviations(this.socket.machineProfile);
+
+		// Combine log with aggregation results
+		const combined = log.map(currLog => {
+			currLog = currLog.toObject();
+			const currDevs = aggDeviations.filter(controlDevs => {
+				return String(controlDevs._id) === String(currLog.control_id)
+			})[0];
+			delete currLog.__v;
+			return {
+				...currLog,
+				...currDevs
+			}
+		});
+
+		// Emit push message to machine's channel
+		this.socket.to(this.socket.machineProfile.id).emit('push', combined);
 	};
 
 
