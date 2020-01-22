@@ -15,43 +15,26 @@ try {
     process.exit();
 }
 
-/* Init Logger */
-const Logger = require('./class/Logger')(appSettings);
-const Db = require('./class/Db')(appSettings, Logger);
+const enums = require('./config/enums.json');
+const Logger = require('./modules/Logger')(appSettings);
+const Db = require('./modules/Db')(appSettings, Logger);
 
-
+/* Server init */
 const init = async () => {
 
 	Logger.info("Initializing "+ appSettings.app.name);
 
 	/* Connect to DB server */
-	await Db.connect().then(async mongoose => {
+	const mongoose = await Db.connect()
 
-		const models = require("./model")(mongoose);
-		const services = require("./service")(appSettings, Logger, mongoose, models);
-		const SocketServer = require('./class/SocketServer')(appSettings, Logger, services);
+	/* Load dependencies */
+	const models = require("./model")(mongoose);
+	const services = require("./service")(appSettings, Logger, mongoose, models);
+	const SocketServer = require('./modules/SocketServer')(appSettings, enums, Logger, services);
 
-
-
-		// const md5 = require('md5')
-		// services.Machine.add({
-		// 	mid: '9fdfdbc0-3bbc-11ea-8e66-33e9f80ea27e',
-		// 	model: 'xt-80',
-		// 	description: 'A machine that produces some sort of part',
-		// 	token: md5('9fdfdbc0-3bbc-11ea-8e66-33e9f80ea27e')
-		// })
-		// .then(m => {
-		// 	console.log("Added new machine", m);
-		// });
-
-
-		/* Init Socket Server */
-		SocketServer.init();
-
-	})
-}
-
-
+	/* Init Socket Server */
+	SocketServer.init();
+};
 
 init()
-	.catch(err => console.log(err));
+	.catch(err => console.log("error", err));
