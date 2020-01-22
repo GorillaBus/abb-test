@@ -52,11 +52,13 @@ module.exports = (appSettings, enums, Logger, services) => {
 	const handleMachineConnection = (socket) => {
 		this.socket = socket;
 
-		socket.emit('auth_succed', {
-			profile: socket.machineProfile.controls
-		});
-
 		SocketManager.registerMachine(socket);
+
+		// Send machine controls profile to client
+		const machineControls = socket.machineProfile.controls.map(c => {
+			return { feature_id: c.feature_id, control_id: c._id, x: c.x, y: c.y, z: c.z, d: c.d }
+		});
+		socket.emit('auth_succed', machineControls);
 
 		// Bind machine socket events
 		socket.on('disconnect', handleMachineDisconnect.bind(this));
@@ -78,10 +80,13 @@ module.exports = (appSettings, enums, Logger, services) => {
 	/*
 	**	Handle addition of new Part to a machine
 	*/
-	const handlePart = (data) => {
+	const handlePart = (payload) => {
 		Logger.info(`PART received from machine: ${this.socket.machineProfile.id}`);
 
-		console.log("Part data: ", data);
+		// Compute deviations
+		const deviations = services.Control.computeDeviations(payload, this.socket.machineProfile.controls);
+
+		console.log(deviations);
 	};
 
 
