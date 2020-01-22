@@ -30,7 +30,6 @@ const MachineSvc = (appSettings, Logger, mongoose, models) => {
 				feature_id: 1,
 				ord: 1
 			}).select({
-				_id: 0,
 				machine_id: 0,
 				__v: 0
 			});
