@@ -1,6 +1,6 @@
 const log4js = require('log4js');
 
-let Logger = (appSettings) => {
+const Logger = (appSettings) => {
 
   /* Logging setup */
   log4js.configure({
@@ -15,16 +15,16 @@ let Logger = (appSettings) => {
     }
   });
 
-  let channel = appSettings.logging.stdout === true ? 'out':'app';
-  let logger = log4js.getLogger(channel);
-  let trace = (message) => { logger.trace(message); };
-  let debug = (message) => { logger.debug(message); };
-  let info = (message) => { logger.info(message); };
-  let warn = (message) => { logger.warn(message); };
-  let error = (message) => { logger.error(message); };
-  let fatal = (message) => { logger.fatal(message); };
+  const channel = appSettings.logging.stdout === true ? 'out':'app';
+  const logger = log4js.getLogger(channel);
+  const trace = (message) => { logger.trace(message); };
+  const debug = (message) => { logger.debug(message); };
+  const info = (message) => { logger.info(message); };
+  const warn = (message) => { logger.warn(message); };
+  const error = (message) => { logger.error(message); };
+  const fatal = (message) => { logger.fatal(message); };
 
-  let close = () => {
+  const close = () => {
     log4js.shutdown();
   };
 
