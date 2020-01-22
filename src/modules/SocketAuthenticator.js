@@ -6,8 +6,6 @@ module.exports = (enums, Logger, services) => {
 
 	const verify = async (socket, next) => {
 
-		console.log("************** VERIFYING")
-
 		const token = socket.handshake.headers.token || null;
 		const agent = parseInt(socket.handshake.headers.agent) || enums.Agents.User;
 
@@ -17,6 +15,7 @@ module.exports = (enums, Logger, services) => {
 			return next(new Error());
 		}
 
+		// Handle machine client
 		if (agent === enums.Agents.Machine) {
 
 			const machineProfile = await services.Machine.getProfile(token);
@@ -30,16 +29,13 @@ module.exports = (enums, Logger, services) => {
 			socket.agent = agent;
 			socket.machineProfile = machineProfile;
 
+
+		// Handle user client
 		} else if (agent === enums.Agents.User) {
 
 			socket.disconnect();
 			Logger.error(`Users not allowed for now...`);
 			return next(new Error());
-		}
-
-		else {
-
-			console.log("Nothing....")
 		}
 
 		return next();
