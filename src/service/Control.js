@@ -12,6 +12,7 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 	*/
 	const computeDeviations = (payload, controls) => {
 		return controls.map(reference => {
+
 			// Get corresponding payload control
 			const values = payload.find((paylodItem) => {
 			    return paylodItem.control_id == reference._id;
@@ -27,10 +28,10 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 
 			// Validation
 			const validation = {
-				x_valid: deviations.x <= reference.tx,
-				y_valid: deviations.y <= reference.ty,
-				z_valid: deviations.z <= reference.tz,
-				d_valid: deviations.d <= reference.td
+				x_valid: deviations.x <= reference.x_tol,
+				y_valid: deviations.y <= reference.y_tol,
+				z_valid: deviations.z <= reference.z_tol,
+				d_valid: deviations.d <= reference.d_tol
 			};
 
 			return {

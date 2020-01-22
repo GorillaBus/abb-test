@@ -12,10 +12,10 @@ const model = (mongoose) => {
 		z: { type: Number, required: true },
 		d: { type: Number, required: true },
 
-		tx: { type: Number, required: true },
-		ty: { type: Number, required: true },
-		tz: { type: Number, required: true },
-		td: { type: Number, required: true },
+		x_tol: { type: Number, required: true },
+		y_tol: { type: Number, required: true },
+		z_tol: { type: Number, required: true },
+		d_tol: { type: Number, required: true },
 
 		ord: { type: Number, required: true }
 	});
