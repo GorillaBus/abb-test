@@ -11,10 +11,10 @@ const model = (mongoose) => {
 		z: { type: Number, required: true },
 		d: { type: Number, required: true },
 
-		dx: { type: Number, required: false },
-		dy: { type: Number, required: false },
-		dz: { type: Number, required: false },
-		dd: { type: Number, required: false },
+		x_dev: { type: Number, required: false },
+		y_dev: { type: Number, required: false },
+		z_dev: { type: Number, required: false },
+		d_dev: { type: Number, required: false },
 
 		date: { type: Date, required: true, default: Date.now }
 	});

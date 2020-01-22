@@ -19,10 +19,10 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 
 			// Deviations
 			const deviations = {
-				x: Math.abs(values.x - reference.x),
-				y: Math.abs(values.y - reference.y),
-				z: Math.abs(values.z - reference.z),
-				d: Math.abs(values.d - reference.d)
+				x_dev: Math.abs(values.x - reference.x),
+				y_dev: Math.abs(values.y - reference.y),
+				z_dev: Math.abs(values.z - reference.z),
+				d_dev: Math.abs(values.d - reference.d)
 			};
 
 			// Validation
