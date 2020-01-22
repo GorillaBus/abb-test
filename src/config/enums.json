@@ -1,0 +1,6 @@
+{
+    "Agents": {
+        "User": 0,
+        "Machine": 1
+    }
+}
