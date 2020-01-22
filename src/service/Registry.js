@@ -21,10 +21,10 @@ const Registry = (appSettings, Logger, mongoose, models) => {
 			{ $limit:  totalControls * lastN },
 			{ $group: {
 				_id: "$control_id",
-	            total_dx: { $sum: "$x_dev" },
-	            total_dy: { $sum: "$y_dev" },
-	            total_dz: { $sum: "$z_dev" },
-	            total_dd: { $sum: "$d_dev" }
+	            x_total_dev: { $sum: "$x_dev" },
+	            y_total_dev: { $sum: "$y_dev" },
+	            z_total_dev: { $sum: "$z_dev" },
+	            d_total_dev: { $sum: "$d_dev" }
 			}
 		}]);
 	};
