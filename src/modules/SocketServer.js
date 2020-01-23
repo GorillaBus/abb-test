@@ -79,8 +79,27 @@ module.exports = (appSettings, enums, Logger, services) => {
 	**	Handle new user connections
 	*/
 	const handleUserConnection = (socket) => {
-		Logger.info(`CONNECT (user) id: ${socket.userProfile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
 		SocketManager.registerUser(socket);
+
+		socket.on('list_machines', handleListMachines);
+		socket.on('switch_channel', handleSwitchChannel);
+
+		Logger.info(`CONNECT (user) id: ${socket.userProfile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
+	};
+
+	/*
+	**	Switches the client to a specified machine channel
+	*/
+	const handleSwitchChannel = function(payload) {
+		SocketChannelManager.switchToChannel(this, payload.channel_id);
+	};
+
+	/*
+	**	Responds with a list of all available machines
+	*/
+	const handleListMachines = function(payload, ack) {
+		const machines = SocketManager.getConnectedMachines();
+		ack(machines);
 	};
 
 	/*
