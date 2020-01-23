@@ -6,24 +6,21 @@ const MachineSvc = (appSettings, Logger, mongoose, models) => {
 		return models.Machine.create(data);
 	};
 
-	const findByToken = (token) => {
-		return models.Machine.findOne({
-			token: token
-		}).select({
-			token: 0,
-			__v: 0
-		});
-	};
-
 
 	/*
-	**	Validates a token and returns a machine profile or false
+	**	Finds a machine profile by it's user ID
 	*/
-	const getProfileByToken = async (token) => {
-		const machine = await findByToken(token);
+	const getProfile = async (userId) => {
+		const machine = await models.Machine.findOne({
+			user_id: userId
+		})
+		.populate({ path: 'user_id', select: { name: 1 } })
+		.lean();
+
 		if (!machine) {
 			return false;
 		}
+
 		const controls = await models.Control.find({
 				machine_id: machine._id
 			}).sort({
@@ -32,7 +29,8 @@ const MachineSvc = (appSettings, Logger, mongoose, models) => {
 			}).select({
 				machine_id: 0,
 				__v: 0
-			});
+			})
+			.lean();
 
 		// Warn if no controls where found for this machine
 		if (controls.length === 0) {
@@ -52,8 +50,7 @@ const MachineSvc = (appSettings, Logger, mongoose, models) => {
 
 	return {
 		add,
-		findByToken,
-		getProfile: getProfileByToken
+		getProfile
 	}
 };
 

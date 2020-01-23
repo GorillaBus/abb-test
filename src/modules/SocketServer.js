@@ -9,7 +9,8 @@ module.exports = (appSettings, enums, Logger, services) => {
 
 
 	/*
-	**	Initialization
+	**	Initialization: starts the socket.io server, handles authentification
+	**	of incoming connections and delegates connection handling by agent type
 	*/
 	const init = () => {
 
@@ -25,7 +26,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 
 
 	/*
-	**	Socket connection handler
+	**	Socket connection by agent type: user / machine
 	*/
 	const handleConnection = (socket) => {
 
@@ -64,7 +65,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 		socket.on('disconnect', handleMachineDisconnect.bind(this));
 		socket.on('part', handlePart.bind(this));
 
-		Logger.info(`CONNECT machine ${socket.machineID} with socket ${socket.id} at ${new Date().toISOString()}`);
+		Logger.info(`CONNECT machine ${socket.machineID} with socket ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
 	};
 
 

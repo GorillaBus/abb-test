@@ -28,9 +28,10 @@ const init = async () => {
 	const mongoose = await Db.connect()
 
 	/* Load dependencies */
-	const models = require("./model")(mongoose);
+	const models = require("./model")(mongoose, enums);
 	const services = require("./service")(appSettings, Logger, mongoose, models);
 	const SocketServer = require('./modules/SocketServer')(appSettings, enums, Logger, services);
+
 
 	/* Init Socket Server */
 	SocketServer.init();

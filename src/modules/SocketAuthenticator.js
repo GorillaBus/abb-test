@@ -5,7 +5,6 @@ const md5 = require("md5");
 module.exports = (enums, Logger, services) => {
 
 	const verify = async (socket, next) => {
-
 		const token = socket.handshake.headers.token || null;
 		const agent = parseInt(socket.handshake.headers.agent) || enums.Agents.User;
 
@@ -15,10 +14,21 @@ module.exports = (enums, Logger, services) => {
 			return next(new Error());
 		}
 
-		// Handle machine client
-		if (agent === enums.Agents.Machine) {
+		// Get user by Token (fake auth)
+		const user = await services.User.findByToken(token);
+		if (!user) {
+			socket.disconnect();
+			Logger.error(`Invalid session, sid: ${socket.id}, host: ${socket.handshake.headers.host}, token: ${token}`);
+			return next(new Error());
+		}
 
-			const machineProfile = await services.Machine.getProfile(token);
+		// Set the agent into the socket
+		socket.agent = user.agent;
+
+		// Handle Agnet types
+		if (socket.agent === enums.Agents.Machine) {
+
+			const machineProfile = await services.Machine.getProfile(user._id);
 			if (!machineProfile) {
 				socket.disconnect();
 				Logger.error(`Invalid token received, sid: ${socket.id}, host: ${socket.handshake.headers.host}, token: ${token}`);
@@ -26,16 +36,12 @@ module.exports = (enums, Logger, services) => {
 			}
 
 			// Save machine profile into socket
-			socket.agent = agent;
 			socket.machineProfile = machineProfile;
 
-
 		// Handle user client
-		} else if (agent === enums.Agents.User) {
+		} else if (socket.agent === enums.Agents.User) {
 
-			socket.disconnect();
-			Logger.error(`Users not allowed for now...`);
-			return next(new Error());
+			socket.userProfile = user;
 		}
 
 		return next();
