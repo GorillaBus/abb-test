@@ -17,7 +17,7 @@ const SocketManager = (enums, Logger) => {
 			return false;
 		}
 
-		const machineId = socket.machineProfile.id;
+		const machineId = socket.profile.id;
 		machineSockets[machineId] = socket;
 	};
 
@@ -40,7 +40,7 @@ const SocketManager = (enums, Logger) => {
 			return false;
 		}
 
-		const userId = socket.userProfile.id;
+		const userId = socket.profile.id;
 		userSockets[userId] = socket;
 	};
 
@@ -63,9 +63,9 @@ const SocketManager = (enums, Logger) => {
 	*/
 	const remove = (socket, callback) => {
 		if (socket.agent === enums.Agents.User) {
-			delete userSockets[socket.userProfile.id];
+			delete userSockets[socket.profile.id];
 		} else {
-			delete machineSockets[socket.machineProfile.id];
+			delete machineSockets[socket.profile.id];
 		}
 	};
 

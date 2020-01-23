@@ -28,20 +28,20 @@ module.exports = (enums, Logger, services) => {
 		// Handle Agnet types
 		if (socket.agent === enums.Agents.Machine) {
 
-			const machineProfile = await services.Machine.getProfile(user._id);
-			if (!machineProfile) {
+			const profile = await services.Machine.getProfile(user._id);
+			if (!profile) {
 				socket.disconnect();
 				Logger.error(`Invalid token received, sid: ${socket.id}, host: ${socket.handshake.headers.host}, token: ${token}`);
 				return next(new Error());
 			}
 
 			// Save machine profile into socket
-			socket.machineProfile = machineProfile;
+			socket.profile = profile;
 
 		// Handle user client
 		} else if (socket.agent === enums.Agents.User) {
 
-			socket.userProfile = {
+			socket.profile = {
 				id: user._id,
 				name: user.name
 			};

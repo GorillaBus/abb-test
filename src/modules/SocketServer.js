@@ -60,7 +60,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 		SocketManager.registerMachine(socket);
 
 		// Send machine controls profile to client
-		const machineControls = socket.machineProfile.controls.map(c => {
+		const machineControls = socket.profile.controls.map(c => {
 			return { feature_id: c.feature_id, control_id: c._id, x: c.x, y: c.y, z: c.z, d: c.d }
 		});
 
@@ -70,9 +70,9 @@ module.exports = (appSettings, enums, Logger, services) => {
 		socket.on('part', handlePart);
 
 		// Create machine channel
-		SocketChannelManager.createChannel(String(socket.machineProfile.id));
+		SocketChannelManager.createChannel(String(socket.profile.id));
 
-		Logger.info(`CONNECT (machine) id: ${socket.machineProfile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
+		Logger.info(`CONNECT (machine) id: ${socket.profile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
 	};
 
 	/*
@@ -84,7 +84,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 		socket.on('list_machines', handleListMachines);
 		socket.on('switch_channel', handleSwitchChannel);
 
-		Logger.info(`CONNECT (user) id: ${socket.userProfile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
+		Logger.info(`CONNECT (user) id: ${socket.profile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
 	};
 
 	/*
@@ -118,9 +118,9 @@ module.exports = (appSettings, enums, Logger, services) => {
 	**	Machine disconnection
 	*/
 	const disconnectMachineSocket = (socket) => {
-		SocketChannelManager.removeChannel(socket.machineProfile.id);
+		SocketChannelManager.removeChannel(socket.profile.id);
 
-		Logger.info(`DISCONNECT (machine) id: ${socket.machineProfile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
+		Logger.info(`DISCONNECT (machine) id: ${socket.profile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
 	};
 
 	/*
@@ -129,7 +129,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 	const disconnectUserSocket = (socket) => {
 		SocketChannelManager.leaveAllChannels(socket);
 
-		Logger.info(`DISCONNECT (user) id: ${socket.userProfile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
+		Logger.info(`DISCONNECT (user) id: ${socket.profile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
 	};
 
 
@@ -145,13 +145,13 @@ module.exports = (appSettings, enums, Logger, services) => {
 	const handlePart = async function(payload) {
 
 		// Validate part controls and get a report
-		const report = services.Control.validateControlData(payload, this.machineProfile);
+		const report = services.Control.validateControlData(payload, this.profile);
 
 		// Save log to db
 		const log = await services.Log.save(report);
 
 		// Get aggregated sum of deviations per control per part
-		const aggDeviations = await services.Log.getAggregatedDeviations(this.machineProfile);
+		const aggDeviations = await services.Log.getAggregatedDeviations(this.profile);
 
 		// Combine log with aggregation results
 		const combined = log.map(currLog => {
@@ -167,9 +167,9 @@ module.exports = (appSettings, enums, Logger, services) => {
 		});
 
 		// Emit push message to machine's channel
-		server.to(this.machineProfile.id).emit('push', combined);
+		server.to(this.profile.id).emit('push', combined);
 
-		Logger.info(`PART payload received from machine: ${this.machineProfile.id}`);
+		Logger.info(`PART payload received from machine: ${this.profile.id}`);
 	};
 
 
