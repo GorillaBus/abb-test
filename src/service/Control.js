@@ -7,8 +7,10 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 	};
 
 	/*
-	**	Computes deviations in part creation by comparing payload
-	**	values with some part's control profile.
+	**	Computes deviations in part features by comparing payload
+	**	values with a part's control profile. This last is passed by reference
+	**	as it is persisted in memory to minimize db queries of data that is note
+	**	supossed to change frequently (or ever)
 	*/
 	const validateControlData = (payload, profile) => {
 		return profile.controls.map(reference => {
