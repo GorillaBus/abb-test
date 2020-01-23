@@ -45,10 +45,11 @@ module.exports = (appSettings, enums, Logger, services) => {
 			socket.disconnect();
 		}
 
-		setTimeout(() => {
-			const status = SocketManager.getStatus();
-			console.log(status);
-		})
+		// DEBUG
+		// setTimeout(() => {
+		// 	const status = SocketManager.getStatus();
+		// 	console.log(status);
+		// })
 	};
 
 
@@ -72,7 +73,8 @@ module.exports = (appSettings, enums, Logger, services) => {
 		// Bind machine socket events
 		socket.on('part', handlePart.bind(this));
 
-
+		// Create machine channel
+		SocketManager.createChannel(String(socket.machineProfile.id));
 
 		Logger.info(`CONNECT (machine) id: ${socket.machineProfile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
 	};
@@ -104,6 +106,8 @@ module.exports = (appSettings, enums, Logger, services) => {
 	**	Machine disconnection
 	*/
 	const disconnectMachineSocket = (socket) => {
+		SocketManager.removeChannel(socket.machineProfile.id);
+
 		Logger.info(`DISCONNECT (machine) id: ${socket.machineProfile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
 	};
 
@@ -112,6 +116,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 	*/
 	const disconnectUserSocket = (socket) => {
 		Logger.info(`DISCONNECT (user) id: ${socket.userProfile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
+		SocketManager.leaveAllChannels(socket);
 	};
 
 
@@ -125,16 +130,18 @@ module.exports = (appSettings, enums, Logger, services) => {
 	**
 	*/
 	const handlePart = async (payload) => {
-		Logger.info(`PART payload received from machine: ${this.socket.machineProfile.id}`);
+		const socket = this.socket;
+
+		Logger.info(`PART payload received from machine: ${socket.machineProfile.id}`);
 
 		// Validate part controls and get a report
-		const report = services.Control.validateControlData(payload, this.socket.machineProfile);
+		const report = services.Control.validateControlData(payload, socket.machineProfile);
 
 		// Save log to db
 		const log = await services.Registry.save(report);
 
 		// Get aggregated sum of deviations per control per part
-		const aggDeviations = await services.Registry.getAggregatedDeviations(this.socket.machineProfile);
+		const aggDeviations = await services.Registry.getAggregatedDeviations(socket.machineProfile);
 
 		// Combine log with aggregation results
 		const combined = log.map(currLog => {
@@ -150,7 +157,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 		});
 
 		// Emit push message to machine's channel
-		this.socket.to(this.socket.machineProfile.id).emit('push', combined);
+		server.to(String(socket.machineProfile.id)).emit('push', combined);
 	};
 
 
