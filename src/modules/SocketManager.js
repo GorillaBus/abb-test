@@ -21,6 +21,13 @@ const SocketManager = (enums, Logger) => {
 		machineSockets[machineId] = socket;
 	};
 
+	/*
+	**	Returns a list of connected machines
+	*/
+	const getConnectedMachines = () => {
+		return Object.keys(machineSockets);
+	};
+
 
 	/*
 	**	Register a new user connection
@@ -67,7 +74,8 @@ const SocketManager = (enums, Logger) => {
 		registerMachine,
 		registerUser,
 		remove,
-		getStatus
+		getStatus,
+		getConnectedMachines
 	};
 }
 
