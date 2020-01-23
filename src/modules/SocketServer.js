@@ -129,10 +129,10 @@ module.exports = (appSettings, enums, Logger, services) => {
 		const report = services.Control.validateControlData(payload, this.machineProfile);
 
 		// Save log to db
-		const log = await services.Registry.save(report);
+		const log = await services.Log.save(report);
 
 		// Get aggregated sum of deviations per control per part
-		const aggDeviations = await services.Registry.getAggregatedDeviations(this.machineProfile);
+		const aggDeviations = await services.Log.getAggregatedDeviations(this.machineProfile);
 
 		// Combine log with aggregation results
 		const combined = log.map(currLog => {

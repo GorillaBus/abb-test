@@ -1,6 +1,6 @@
 'use strict'
 
-const Registry = (appSettings, Logger, mongoose, models) => {
+const LogSvc = (appSettings, Logger, mongoose, models) => {
 
 	const save = (report) => {
 		return models.Log.create(report);
@@ -35,4 +35,4 @@ const Registry = (appSettings, Logger, mongoose, models) => {
 	}
 };
 
-module.exports = Registry;
+module.exports = LogSvc;
