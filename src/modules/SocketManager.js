@@ -2,7 +2,7 @@
 
 const Utils = require('./Utils')();
 
-const SocketManager = (appSettings, Logger) => {
+const SocketManager = (enums, Logger) => {
 	const machineSockets = {};
 	const userSockets = {};
 
@@ -22,6 +22,31 @@ const SocketManager = (appSettings, Logger) => {
 		machineSockets[machineId] = socket;
 	};
 
+
+	/*
+	**	Register a new user connection
+	*/
+	const registerUser = async (socket) => {
+
+		// DEV: warn on null sockets
+		if (!socket) {
+			Logger.warn(`SocketManager :: registerUser invoked with null socket`);
+			return false;
+		}
+
+		const userId = socket.userProfile.id;
+		userSockets[userId] = socket;
+	};
+
+
+	const getStatus = () => {
+		return {
+			machines: {machineSockets},
+			users: {userSockets}
+		}
+	};
+
+
 	const getMachineSocket = (machineId) => {
 		return machineSockets[machineId];
 	};
@@ -31,17 +56,19 @@ const SocketManager = (appSettings, Logger) => {
 	**	Remove existing socket
 	*/
 	const remove = (socket, callback) => {
-		var userId = socket.userId;
-		// Deleting socket identifier;
-		if (socket.machineID) {
-			delete sockets[socket.machineID];
+		if (socket.agent === enums.Agents.User) {
+			delete userSockets[socket.userProfile.id];
+		} else {
+			delete machineSockets[socket.machineProfile.id];
 		}
 	};
 
 	return {
 		getMachineSocket,
 		registerMachine,
-		remove
+		registerUser,
+		remove,
+		getStatus
 	};
 }
 

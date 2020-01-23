@@ -5,7 +5,7 @@ const md5 = require("md5");
 module.exports = (enums, Logger, services) => {
 
 	const verify = async (socket, next) => {
-		const token = socket.handshake.headers.token || null;
+		const token = socket.handshake.headers.token || socket.handshake.query.token || null;
 		const agent = parseInt(socket.handshake.headers.agent) || enums.Agents.User;
 
 		if(!token) {
@@ -41,7 +41,10 @@ module.exports = (enums, Logger, services) => {
 		// Handle user client
 		} else if (socket.agent === enums.Agents.User) {
 
-			socket.userProfile = user;
+			socket.userProfile = {
+				id: user._id,
+				name: user.name
+			};
 		}
 
 		return next();

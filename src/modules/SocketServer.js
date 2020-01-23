@@ -2,7 +2,7 @@
 
 module.exports = (appSettings, enums, Logger, services) => {
 	const io = require("socket.io");
-	const SocketManager = require('./SocketManager')(appSettings, Logger);
+	const SocketManager = require('./SocketManager')(enums, Logger);
 	const SocketAuthenticator = require('./SocketAuthenticator')(enums, Logger, services);
 
 	let server = null;
@@ -41,6 +41,11 @@ module.exports = (appSettings, enums, Logger, services) => {
 			Logger.warn(`CONNECT unrecognized agent, socket ${socket.id} at ${new Date().toISOString()}`);
 			socket.disconnect();
 		}
+
+		setTimeout(() => {
+			const status = SocketManager.getStatus();
+			console.log(status);
+		})
 	};
 
 
@@ -66,6 +71,11 @@ module.exports = (appSettings, enums, Logger, services) => {
 		socket.on('part', handlePart.bind(this));
 
 		Logger.info(`CONNECT machine ${socket.machineID} with socket ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
+	};
+
+
+	const handleUserConnection = (socket) => {
+		SocketManager.registerUser(socket);
 	};
 
 
