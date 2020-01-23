@@ -148,7 +148,6 @@ module.exports = (appSettings, enums, Logger, services) => {
 		});
 
 		// Emit push message to machine's channel
-		console.log("Emitting ti: ", this.machineProfile.id);
 		server.to(this.machineProfile.id).emit('push', combined);
 
 		Logger.info(`PART payload received from machine: ${this.machineProfile.id}`);
