@@ -1,9 +1,11 @@
 {
 	"app": {
-	    "name": "ABB Technical Test",
-	    "port": 3000,
-	    "debug": true
+	    "name": "ABB Technical Test"
 	},
+    "socket": {
+		"host": "127.0.0.1",
+		"port": 3000
+    },
 	"reports": {
 		"show_last_n_aggregated_devs": 60
 	},
@@ -19,12 +21,6 @@
 			"useCreateIndex": true
 		}
 	},
-    "socket": {
-        "ping": {
-            "pingTimeout": 10000,
-            "pingInterval": 10000
-        }
-    },
 	"logging": {
 	    "file" : "../log/app.log",
 	    "max_size" : 10485760,

@@ -16,7 +16,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 	const init = () => {
 
 		// Start listening
-		server = io.listen(appSettings.app.port);
+		server = io.listen(appSettings.socket.port);
 
 		// Authentification middleware
 		server.use(SocketAuthenticator.verify);
