@@ -29,6 +29,9 @@ module.exports = (appSettings, enums, Logger, services) => {
 	**	Socket connection by agent type: user / machine
 	*/
 	const handleConnection = (socket) => {
+		this.socket = socket;
+
+		socket.on('disconnect', handleDisconnect.bind(this));
 
 		if (socket.agent === enums.Agents.User) {
 			handleUserConnection(socket);
@@ -67,25 +70,50 @@ module.exports = (appSettings, enums, Logger, services) => {
 		socket.emit('auth_succed', machineControls);
 
 		// Bind machine socket events
-		socket.on('disconnect', handleMachineDisconnect.bind(this));
 		socket.on('part', handlePart.bind(this));
 
-		Logger.info(`CONNECT machine ${socket.machineID} with socket ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
+
+
+		Logger.info(`CONNECT (machine) id: ${socket.machineProfile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
 	};
 
-
+	/*
+	**	Handle new user connections
+	*/
 	const handleUserConnection = (socket) => {
+		Logger.info(`CONNECT (user) id: ${socket.userProfile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
 		SocketManager.registerUser(socket);
 	};
 
+	/*
+	**	Handle socket disconnection by agent type
+	*/
+	const handleDisconnect = () => {
+		const {socket} = this;
+
+		if (socket.agent === enums.Agents.User) {
+			disconnectUserSocket(socket);
+		} else if (socket.agent === enums.Agents.Machine) {
+			disconnectMachineSocket(socket);
+		}
+
+		SocketManager.remove(socket);
+	};
 
 	/*
-	**	Handle disconnection
+	**	Machine disconnection
 	*/
-	const handleMachineDisconnect = () => {
-		Logger.info(`DISCONNECT sid: ${this.socket.id}, host: ${this.socket.handshake.headers.host}, mid: ${this.socket.machineProfile.id}`);
-		SocketManager.remove(this.socket);
+	const disconnectMachineSocket = (socket) => {
+		Logger.info(`DISCONNECT (machine) id: ${socket.machineProfile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
 	};
+
+	/*
+	**	User disconnection
+	*/
+	const disconnectUserSocket = (socket) => {
+		Logger.info(`DISCONNECT (user) id: ${socket.userProfile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
+	};
+
 
 
 	/*
