@@ -4,13 +4,14 @@ module.exports = (appSettings, enums, Logger, services) => {
 	const io = require("socket.io");
 	const SocketManager = require('./SocketManager')(enums, Logger);
 	const SocketAuthenticator = require('./SocketAuthenticator')(enums, Logger, services);
+	const SocketChannelManager = require('./SocketChannelManager')(enums, Logger);
 
 	let server = null;
 
 
 	/*
 	**	Initialization: starts the socket.io server, handles authentification
-	**	of incoming connections and delegates connection handling by agent type
+	**	with middleware and delegates connection handling by agent type
 	*/
 	const init = () => {
 
@@ -25,56 +26,51 @@ module.exports = (appSettings, enums, Logger, services) => {
 	};
 
 
+
 	/*
 	**	Socket connection by agent type: user / machine
 	*/
 	const handleConnection = (socket) => {
-		this.socket = socket;
+		socket.on('disconnect', handleDisconnect);
 
-		socket.on('disconnect', handleDisconnect.bind(this));
-
+		// Standard user connection
 		if (socket.agent === enums.Agents.User) {
 			handleUserConnection(socket);
 
+		// Machine user connection
 		} else if (socket.agent ===  enums.Agents.Machine) {
 			handleMachineConnection(socket);
 
+		// Discard any other unrecognized agent
 		} else {
 
 			Logger.warn(`CONNECT unrecognized agent, socket ${socket.id} at ${new Date().toISOString()}`);
 			socket.disconnect();
 		}
-
-		// DEBUG
-		// setTimeout(() => {
-		// 	const status = SocketManager.getStatus();
-		// 	console.log(status);
-		// })
 	};
 
 
-	/* Handlers for socket events */
+	/* Socket event handlers */
 
 
 	/*
 	**	Handle new machine connections
 	*/
 	const handleMachineConnection = (socket) => {
-		this.socket = socket;
-
 		SocketManager.registerMachine(socket);
 
 		// Send machine controls profile to client
 		const machineControls = socket.machineProfile.controls.map(c => {
 			return { feature_id: c.feature_id, control_id: c._id, x: c.x, y: c.y, z: c.z, d: c.d }
 		});
+
 		socket.emit('auth_succed', machineControls);
 
 		// Bind machine socket events
-		socket.on('part', handlePart.bind(this));
+		socket.on('part', handlePart);
 
 		// Create machine channel
-		SocketManager.createChannel(String(socket.machineProfile.id));
+		SocketChannelManager.createChannel(String(socket.machineProfile.id));
 
 		Logger.info(`CONNECT (machine) id: ${socket.machineProfile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
 	};
@@ -90,23 +86,20 @@ module.exports = (appSettings, enums, Logger, services) => {
 	/*
 	**	Handle socket disconnection by agent type
 	*/
-	const handleDisconnect = () => {
-		const {socket} = this;
-
-		if (socket.agent === enums.Agents.User) {
-			disconnectUserSocket(socket);
-		} else if (socket.agent === enums.Agents.Machine) {
-			disconnectMachineSocket(socket);
+	const handleDisconnect = function() {
+		if (this.agent === enums.Agents.User) {
+			disconnectUserSocket(this);
+		} else if (this.agent === enums.Agents.Machine) {
+			disconnectMachineSocket(this);
 		}
-
-		SocketManager.remove(socket);
+		SocketManager.remove(this);
 	};
 
 	/*
 	**	Machine disconnection
 	*/
 	const disconnectMachineSocket = (socket) => {
-		SocketManager.removeChannel(socket.machineProfile.id);
+		SocketChannelManager.removeChannel(socket.machineProfile.id);
 
 		Logger.info(`DISCONNECT (machine) id: ${socket.machineProfile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
 	};
@@ -115,8 +108,9 @@ module.exports = (appSettings, enums, Logger, services) => {
 	**	User disconnection
 	*/
 	const disconnectUserSocket = (socket) => {
+		SocketChannelManager.leaveAllChannels(socket);
+
 		Logger.info(`DISCONNECT (user) id: ${socket.userProfile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
-		SocketManager.leaveAllChannels(socket);
 	};
 
 
@@ -129,19 +123,16 @@ module.exports = (appSettings, enums, Logger, services) => {
 	**	Saves the report to DB
 	**
 	*/
-	const handlePart = async (payload) => {
-		const socket = this.socket;
-
-		Logger.info(`PART payload received from machine: ${socket.machineProfile.id}`);
+	const handlePart = async function(payload) {
 
 		// Validate part controls and get a report
-		const report = services.Control.validateControlData(payload, socket.machineProfile);
+		const report = services.Control.validateControlData(payload, this.machineProfile);
 
 		// Save log to db
 		const log = await services.Registry.save(report);
 
 		// Get aggregated sum of deviations per control per part
-		const aggDeviations = await services.Registry.getAggregatedDeviations(socket.machineProfile);
+		const aggDeviations = await services.Registry.getAggregatedDeviations(this.machineProfile);
 
 		// Combine log with aggregation results
 		const combined = log.map(currLog => {
@@ -157,7 +148,10 @@ module.exports = (appSettings, enums, Logger, services) => {
 		});
 
 		// Emit push message to machine's channel
-		server.to(String(socket.machineProfile.id)).emit('push', combined);
+		console.log("Emitting ti: ", this.machineProfile.id);
+		server.to(this.machineProfile.id).emit('push', combined);
+
+		Logger.info(`PART payload received from machine: ${this.machineProfile.id}`);
 	};
 
 

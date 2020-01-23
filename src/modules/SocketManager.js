@@ -5,55 +5,6 @@ const Utils = require('./Utils')();
 const SocketManager = (enums, Logger) => {
 	const machineSockets = {};
 	const userSockets = {};
-	const channels = {};
-
-
-	const createChannel = (channelId) => {
-		channelId = String(channelId);
-		if (channels.hasOwnProperty(channelId)) {
-			return false;
-		}
-		channels[channelId] = [];
-	};
-
-	const removeChannel = (channelId) => {
-		channelId = String(channelId);
-		delete channels[channelId];
-	};
-
-	const joinChannel = (socket, channelId) => {
-		channelId = String(channelId);
-		if (!channels.hasOwnProperty(channelId)) {
-			return;
-		}
-		socket.join(channelId);
-		channels[channelId].push(socket.id);
-	};
-
-	const leaveChannel = (socket, channelId) => {
-		channelId = String(channelId);
-		const index = channels[channelId].findIndex(socketId => socketId === socket.id);
-		if (index) {
-			channels[channelId].splice(index, 1);
-		}
-	}
-
-	const leaveAllChannels = (socket) => {
-		Object.keys(channels).forEach(channelId => {
-			leaveChannel(socket, channelId);
-		})
-	};
-
-	const switchToChannel = (socket, channelId) => {
-		channelId = String(channelId);
-		leaveAllChannels(socket);
-		joinChannel(socket, channelId);
-	};
-
-	const getChannelStatus = () => {
-		return channels;
-	};
-
 
 	/*
 	**	Register a new machine connection
@@ -116,16 +67,7 @@ const SocketManager = (enums, Logger) => {
 		registerMachine,
 		registerUser,
 		remove,
-		getStatus,
-
-		getChannelStatus,
-		switchToChannel,
-		createChannel,
-		removeChannel,
-		joinChannel,
-		leaveChannel,
-		leaveAllChannels,
-		switchToChannel
+		getStatus
 	};
 }
 
