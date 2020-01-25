@@ -2,9 +2,11 @@
 
 module.exports = (appSettings, enums, Logger, services) => {
 	const io = require("socket.io");
+	const SocketError = require('./SocketError')(Logger);
 	const SocketManager = require('./SocketManager')(enums, Logger);
 	const SocketAuthenticator = require('./SocketAuthenticator')(enums, Logger, services);
 	const SocketChannelManager = require('./SocketChannelManager')(enums, Logger);
+
 
 	let server = null;
 
@@ -44,8 +46,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 		// Discard any other unrecognized agent
 		} else {
 
-			Logger.warn(`CONNECT unrecognized agent, socket ${socket.id} at ${new Date().toISOString()}`);
-			socket.disconnect();
+			SocketError.dispatch(socket, enums.SocketErrors.Agent);
 		}
 	};
 

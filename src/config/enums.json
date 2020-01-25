@@ -2,5 +2,9 @@
     "Agents": {
         "User": 0,
         "Machine": 1
-    }
+    },
+	"SocketErrors": {
+		"Auth": 100,
+		"Agent": 101
+	}
 }

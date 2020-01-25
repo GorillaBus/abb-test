@@ -4,8 +4,27 @@ const uuidv1 = require('uuid/v1');
 const token = "080fd43c58fabbb734f7cfccc7047e64";
 let profile = {};
 
+
+/* Handlers */
+
+const handleSocketError = (err) => {
+	console.log(`> Error ${err.code}: ${err.message}`);
+};
+
+const handleDisconnect = (data) => {
+	removeHandlers();
+	console.log("> Disconnected from server");
+};
+
+const handleAuthSuccess = (machineProfile) => {
+	console.log("> Authentifcation successful");
+	initSession(machineProfile);
+}
+
+
+
 // Connect to server
-console.log(`Connecting machine to server, token: ${token}`);
+console.log(`> Connecting machine to server, token: ${token}`);
 
 const socket = require('socket.io-client')('http://127.0.0.1:3000', {
 	transports: ['websocket'],
@@ -13,11 +32,13 @@ const socket = require('socket.io-client')('http://127.0.0.1:3000', {
 });
 
 
+socket.on('error', handleSocketError);
+
 /* Bind event listeners */
 socket.on('connect', () => {
 	socket.on('disconnect', handleDisconnect);
 
-	console.log('Connected to remote server...');
+	console.log("> Connected to remote server...");
 
 	socket.on("auth_succed", handleAuthSuccess);
 });
@@ -70,6 +91,8 @@ const emmiter = (interval, max) => {
 		const payload = randomPartPayload();
 	 	socket.emit('part', payload);
 		counter++;
+
+	console.log("> Emitting part event");
 	}, interval);
 };
 
@@ -89,42 +112,3 @@ const randomPartPayload = () => {
 		}
 	});
 };
-
-
-/* Handlers */
-
-const handleDisconnect = (data) => {
-	removeHandlers();
-	console.log(`Disconnected from server`);
-};
-
-const handleAuthSuccess = (machineProfile) => {
-	console.log("Authentifcation successful");
-	initSession(machineProfile);
-}
-
-
-// const t = setTimeout(() => {
-//
-// 	// const controls = [{
-// 	// 	x: Math.random(),
-// 	// 	y: Math.random(),
-// 	// 	z: Math.random(),
-// 	// 	diameter: Math.floor((Math.random() * 10) + 1)
-// 	// },{
-// 	// 	x: Math.random(),
-// 	// 	y: Math.random(),
-// 	// 	z: Math.random(),
-// 	// 	diameter: Math.floor((Math.random() * 10) + 1)
-// 	// },{
-// 	// 	x: Math.random(),
-// 	// 	y: Math.random(),
-// 	// 	z: Math.random(),
-// 	// 	diameter: Math.floor((Math.random() * 10) + 1)
-// 	// }]
-// 	//
-//
-// 	socket.emit("add part");
-//
-//
-// }, 500);

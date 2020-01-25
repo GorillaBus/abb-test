@@ -1,0 +1,10 @@
+{
+	"100": {
+		"message": "Authentifcation failed",
+		"disconnect": true
+	},
+	"101": {
+		"message": "Unrecognized user agent",
+		"disconnect": true
+	}
+}
