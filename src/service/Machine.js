@@ -10,8 +10,7 @@ const MachineSvc = (appSettings, Logger, mongoose, models) => {
 	/*
 	**	Finds a machine and updates it's online status. True by default
 	*/
-	const setOnline = (machineId, status) => {
-		status = status || true;
+	const setOnlineStatus = (machineId, status) => {
 		return models.Machine.findOneAndUpdate({ _id: machineId }, { online: status });
 	}
 
@@ -72,7 +71,7 @@ const MachineSvc = (appSettings, Logger, mongoose, models) => {
 		add,
 		getProfile,
 		getOnlineMachines,
-		setOnline
+		setOnlineStatus
 	}
 };
 
