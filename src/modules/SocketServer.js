@@ -183,6 +183,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 			})[0];
 			delete currLog.__v;
 			return {
+				feature_title: currLog.feature_title,
 				...currLog,
 				...currDevs
 			}
