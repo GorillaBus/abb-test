@@ -60,7 +60,7 @@ module.exports = (appSettings, enums, Logger, services) => {
 	const handleMachineConnection = async (socket) => {
 
 		// Set machine "online" status
-		await services.Machine.setOnline(socket.profile.id);
+		await services.Machine.setOnlineStatus(socket.profile.id, true);
 		socket.profile.online = true;
 
 		SocketManager.registerMachine(socket);
@@ -77,6 +77,9 @@ module.exports = (appSettings, enums, Logger, services) => {
 
 		// Create machine channel
 		SocketChannelManager.createChannel(String(socket.profile.id));
+
+		// Broadcast all clients with machine online event
+		broadcastMachineList(socket);
 
 		Logger.info(`CONNECT (machine) id: ${socket.profile.id}, sid ${socket.id} at ${new Date().toISOString()}, transport: ${socket.conn.transport.name}`);
 	};
@@ -134,8 +137,10 @@ module.exports = (appSettings, enums, Logger, services) => {
 	**	Machine disconnection
 	*/
 	const disconnectMachineSocket = async (socket) => {
-		await services.Machine.setOnline(socket.profile.id, false);
+		await services.Machine.setOnlineStatus(socket.profile.id, false);
 		SocketChannelManager.removeChannel(socket.profile.id);
+
+		broadcastMachineList(socket);
 
 		Logger.info(`DISCONNECT (machine) id: ${socket.profile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
 	};
@@ -189,6 +194,14 @@ module.exports = (appSettings, enums, Logger, services) => {
 		Logger.info(`PART payload received from machine: ${this.profile.id}`);
 	};
 
+
+	/*
+	**	Send machine list update broadcast event to all clients
+	*/
+	const broadcastMachineList = async (socket) => {
+		const machines = await services.Machine.getOnlineMachines();
+		socket.broadcast.emit('update_machines', machines);
+	};
 
 	return {
 		init: init
