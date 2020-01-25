@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"abb.controls"}],"uuid":"7952be84825c4eed8d6d06ba8a55cb4f"}
