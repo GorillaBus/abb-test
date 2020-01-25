@@ -56,7 +56,12 @@ module.exports = (appSettings, enums, Logger, services) => {
 	/*
 	**	Handle new machine connections
 	*/
-	const handleMachineConnection = (socket) => {
+	const handleMachineConnection = async (socket) => {
+
+		// Set machine "online" status
+		await services.Machine.setOnline(socket.profile.id);
+		socket.profile.online = true;
+
 		SocketManager.registerMachine(socket);
 
 		// Send machine controls profile to client
@@ -90,16 +95,26 @@ module.exports = (appSettings, enums, Logger, services) => {
 	/*
 	**	Switches the client to a specified machine channel
 	*/
-	const handleSwitchChannel = function(payload) {
-		SocketChannelManager.switchToChannel(this, payload.channel_id);
+	const handleSwitchChannel = function(payload, ackFn) {
+		const { channel_id } = payload;
+		SocketChannelManager.switchToChannel(this, channel_id);
+
+		ackFn({
+			error: 0,
+			data: {
+				channel_id: channel_id
+			}
+		});
 	};
 
 	/*
 	**	Responds with a list of all available machines
 	*/
-	const handleListMachines = function(payload, ack) {
-		const machines = SocketManager.getConnectedMachines();
+	const handleListMachines = async function(payload, ack) {
+		const machines = await services.Machine.getOnlineMachines();
 		ack(machines);
+
+		Logger.warn(`LIST MACHINES from ${this.agent === enums.Agents.User ? "user":"machine"} id ${this.profile.id}`);
 	};
 
 	/*
@@ -117,7 +132,8 @@ module.exports = (appSettings, enums, Logger, services) => {
 	/*
 	**	Machine disconnection
 	*/
-	const disconnectMachineSocket = (socket) => {
+	const disconnectMachineSocket = async (socket) => {
+		await services.Machine.setOnline(socket.profile.id, false);
 		SocketChannelManager.removeChannel(socket.profile.id);
 
 		Logger.info(`DISCONNECT (machine) id: ${socket.profile.id}, sid: ${socket.id}, host: ${socket.handshake.headers.host}`);
