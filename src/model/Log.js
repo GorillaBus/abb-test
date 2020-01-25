@@ -5,6 +5,8 @@ const model = (mongoose) => {
 	const LogSchema = new mongoose.Schema({
 		machine_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Machine', required: true },
 		control_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Control', required: true },
+		feature_id: { type: Number, required: true },
+		feature_title: { type: String, required: true },
 		x: { type: Number, required: true },
 		y: { type: Number, required: true },
 		z: { type: Number, required: true },
