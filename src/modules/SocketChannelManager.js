@@ -37,6 +37,7 @@ const SocketChannelManager = (enums, Logger) => {
 		if (index) {
 			channels[channelId].splice(index, 1);
 		}
+		socket.leave(channelId);
 
 		Logger.info(`CHANNEL id ${channelId}, socket ${socket.id} left`);
 	}
