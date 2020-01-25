@@ -15,10 +15,10 @@ const model = (mongoose) => {
 		y_dev: { type: Number, required: false },
 		z_dev: { type: Number, required: false },
 		d_dev: { type: Number, required: false },
-		x_valid: { type: Boolean, required: false },
-		y_valid: { type: Boolean, required: false },
-		z_valid: { type: Boolean, required: false },
-		d_valid: { type: Boolean, required: false },
+		x_valid: { type: Number, required: false },
+		y_valid: { type: Number, required: false },
+		z_valid: { type: Number, required: false },
+		d_valid: { type: Number, required: false },
 		date: { type: Date, required: true, default: Date.now }
 	});
 

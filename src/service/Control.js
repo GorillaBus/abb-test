@@ -10,7 +10,7 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 	**	Computes deviations in part features by comparing payload
 	**	values with a part's control profile. This last is passed by reference
 	**	as it is persisted in memory to minimize db queries of data that is note
-	**	supossed to change frequently (or ever)
+	**	supossed to change frequently (or ever).
 	*/
 	const validateControlData = (payload, profile) => {
 		return profile.controls.map(reference => {
@@ -29,11 +29,11 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 			};
 
 			// Validation
-			const validation = {
-				x_valid: deviations.x_dev <= reference.x_tol,
-				y_valid: deviations.y_dev <= reference.y_tol,
-				z_valid: deviations.z_dev <= reference.z_tol,
-				d_valid: deviations.d_dev <= reference.d_tol
+			const validations = {
+				x_valid: deviations.x_dev < 0.1 ? 0 : deviations.x_dev <= reference.x_tol ? 1 : 2,
+				y_valid: deviations.y_dev < 0.1 ? 0 : deviations.y_dev <= reference.y_tol ? 1 : 2,
+				z_valid: deviations.z_dev < 0.1 ? 0 : deviations.z_dev <= reference.z_tol ? 1 : 2,
+				d_valid: deviations.d_dev < 0.1 ? 0 : deviations.d_dev <= reference.d_tol ? 1 : 2
 			};
 
 			return {
@@ -46,7 +46,7 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 				z: values.z,
 				d: values.d,
 				...deviations,
-				...validation
+				...validations
 			}
 		});
 	};
