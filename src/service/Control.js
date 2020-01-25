@@ -38,7 +38,9 @@ const ControlSvc = (appSettings, Logger, mongoose, models) => {
 
 			return {
 				machine_id: profile.id,
+				feature_id: values.feature_id,
 				control_id: values.control_id,
+				feature_title: reference.feature_title,
 				x: values.x,
 				y: values.y,
 				z: values.z,
