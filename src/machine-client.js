@@ -1,7 +1,22 @@
 'use strict'
 
 const uuidv1 = require('uuid/v1');
+
+/*
+	Use the following tokens to simulate a machine connection:
+
+	Machine 1: "080fd43c58fabbb734f7cfccc7047e62"
+	Machine 2: "080fd43c58fabbb734f7cfccc7047e63"
+	Machine 3: "080fd43c58fabbb734f7cfccc7047e64"
+
+
+	Once connected, the client will emit a new part with random values every
+	2000 ms. You can change this behaviour in function "initSession", where you
+	can set the time interval and the max amount of parts to emit.
+*/
+
 const token = "080fd43c58fabbb734f7cfccc7047e64";
+
 let profile = {};
 
 
@@ -22,11 +37,11 @@ const handleAuthSuccess = (machineProfile) => {
 }
 
 
+/* Connect to server */
 
-// Connect to server
 console.log(`> Connecting machine to server, token: ${token}`);
 
-const socket = require('socket.io-client')('http://127.0.0.1:3000', {
+const socket = require('socket.io-client')('http://127.0.0.1:3001', {
 	transports: ['websocket'],
 	extraHeaders: { token }
 });
@@ -64,16 +79,12 @@ const removeHandlers = () => {
 	socket.off('disconnect');
 }
 
-
-
 /*
 **	Configurable part emitting simulation
 */
 const partEmittingSimulation = (interval, max) => {
 	emmiter(interval, max);
 };
-
-
 
 /*
 **	Emmit "part" events to the sever
