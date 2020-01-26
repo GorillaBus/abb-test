@@ -11,6 +11,8 @@
 	can set the time interval and the max amount of parts to emit.
 */
 
+const host = 'http://127.0.0.1:3001';
+
 /* Set token with client argument */
 const args = process.argv.slice(2);
 const tokenList = [
@@ -52,7 +54,7 @@ const handleAuthSuccess = (machineProfile) => {
 
 console.log(`> Connecting machine to server, token: ${token}`);
 
-const socket = require('socket.io-client')('http://127.0.0.1:3001', {
+const socket = require('socket.io-client')(host, {
 	transports: ['websocket'],
 	extraHeaders: { token }
 });
