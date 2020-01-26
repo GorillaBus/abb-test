@@ -1,7 +1,5 @@
 'use strict'
 
-const uuidv1 = require('uuid/v1');
-
 /*
 	Use the following tokens to simulate a machine connection:
 
