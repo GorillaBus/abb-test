@@ -2,19 +2,32 @@
 
 /*
 	Use the following tokens to simulate a machine connection:
-
 	Machine 1: "080fd43c58fabbb734f7cfccc7047e62"
 	Machine 2: "080fd43c58fabbb734f7cfccc7047e63"
 	Machine 3: "080fd43c58fabbb734f7cfccc7047e64"
-
 
 	Once connected, the client will emit a new part with random values every
 	2000 ms. You can change this behaviour in function "initSession", where you
 	can set the time interval and the max amount of parts to emit.
 */
 
-const token = "080fd43c58fabbb734f7cfccc7047e64";
+/* Set token with client argument */
+const args = process.argv.slice(2);
+const tokenList = [
+	"080fd43c58fabbb734f7cfccc7047e62",
+	"080fd43c58fabbb734f7cfccc7047e63",
+	"080fd43c58fabbb734f7cfccc7047e64"
+];
+let n = 0;
+if (args[0] === "--client") {
+	n = parseInt(args[1]);
+	if (args.length < 2 || n < 0 || n > 2) {
+		n = 0;
+	}
+}
+const token = tokenList[n];
 
+// Holds the machine profile
 let profile = {};
 
 
