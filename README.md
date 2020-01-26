@@ -53,7 +53,8 @@ If, perhaps, the scenario were different from what I first imagined, and there w
 ## 3. Installation
 
 1. Make sure you have MongoDB installed in your system. Version **4.2** was used but should run with 4.0 too (not tested).
-2. Clone this repo
+2. Clone this repo:
+`git clone git@github.com:GorillaBus/abb-test.git` 
 3. Install dependencies with `npm install`
 4. Import the database by running: `mongorestore -d abb-test db/`
 
@@ -98,7 +99,7 @@ The front-end displays data from the last registers but also the worst deviation
 Lets first define: **N_CONTROLS** as the total number of controls for a part and **N_LAST** the number of registers to aggregate, in this case, a number of 30 was requested (but it can be configured in **src/config/config.json**).
 
 The query:
-
+```javascript
 db.logs.aggregate([
   { $match: { machine_id: ObjectId("5e29a2c5e22adc395f5744ac") } },
   { $sort: { date: -1 } },
@@ -112,7 +113,7 @@ db.logs.aggregate([
             }
   }
 ])
-
+```
 First I'm matching a particular machine. Remember that this demo assumes one PART per machine, that is why I'm matching MACHINE IDs and not PART IDs (there is not PART collection).
 Secondly I'm sorting by date to have the last records first.
 Then I'm limiting the total records to work with the first **N_CONTROLS * N_LAST** ones: because each time a part is registered all controls are saved in batch, **N_CONTROLS * N_LAST** brings all the relevant registers.
