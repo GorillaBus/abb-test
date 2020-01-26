@@ -7,7 +7,7 @@ const LogSvc = (appSettings, Logger, mongoose, models) => {
 	};
 
 	/*
-	**	Get aggregated sum of deviations per control per part using mongo's
+	**	Get aggregated maximum of deviations per control per part using mongo's
 	**	aggregation framwork.
 	**	We can bring all logged control values together knowing they are saved
 	**	in batches of continuous logs.
@@ -21,10 +21,10 @@ const LogSvc = (appSettings, Logger, mongoose, models) => {
 			{ $limit:  totalControls * lastN },
 			{ $group: {
 				_id: "$control_id",
-	            x_total_dev: { $sum: "$x_dev" },
-	            y_total_dev: { $sum: "$y_dev" },
-	            z_total_dev: { $sum: "$z_dev" },
-	            d_total_dev: { $sum: "$d_dev" }
+	            x_total_dev: { $max: "$x_dev" },
+	            y_total_dev: { $max: "$y_dev" },
+	            z_total_dev: { $max: "$z_dev" },
+	            d_total_dev: { $max: "$d_dev" }
 			}
 		}]);
 	};
