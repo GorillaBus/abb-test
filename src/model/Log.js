@@ -22,6 +22,11 @@ const model = (mongoose) => {
 		date: { type: Date, required: true, default: Date.now }
 	});
 
+	LogSchema.index({ date: 1 }, { unique: false, name: "date_index" });
+	LogSchema.index({ machine_id: 1, date: 1 }, { unique: false, name: "machine_date_index" });
+
+	LogSchema.set('autoIndex', true); // Should change to False on production environment
+
 	const model = mongoose.model("Log", LogSchema);
 
 	return model;
