@@ -1,1 +1,1 @@
-{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"abb.machines"}],"uuid":"538aa6d9edd84d74937feb6ed90aafd0"}
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"abb-test.machines"}],"uuid":"4d92fe8be3cb46058ba04cb34e1eb098"}
