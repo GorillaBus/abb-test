@@ -7,7 +7,7 @@
 		"port": 3001
     },
 	"reports": {
-		"show_last_n_aggregated_devs": 60
+		"show_last_n_aggregated_devs": 30
 	},
 	"mongodb" : {
 		"host" : "127.0.0.1",
