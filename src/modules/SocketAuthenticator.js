@@ -1,7 +1,5 @@
 'use strict';
 
-const md5 = require("md5");
-
 module.exports = (enums, Logger, services) => {
 	const SocketError = require('./SocketError')(Logger);
 
