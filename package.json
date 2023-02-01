@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "log4js": "^6.1.0",
-    "mongoose": "^5.8.9",
+    "mongoose": "^5.13.15",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "stackvis": "^0.5.0"
